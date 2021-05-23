@@ -10,6 +10,7 @@ import { DashboardComponent } from './core/components/dashboard/dashboard.compon
 import { VerifyNumberComponent } from './core/components/verify-number/verify-number.component';
 import { VerifyOtpComponent } from './core/components/verify-otp/verify-otp.component';
 import { SlotOverviewComponent } from './core/components/slot-overview/slot-overview.component';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
@@ -25,6 +26,8 @@ import { SlotOverviewComponent } from './core/components/slot-overview/slot-over
   imports: [
     BrowserModule,
     AppRoutingModule,
+    FormsModule,
+    ReactiveFormsModule
   ],
   schemas:[CUSTOM_ELEMENTS_SCHEMA],
   providers: [],

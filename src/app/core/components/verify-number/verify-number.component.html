@@ -1,1 +1,35 @@
-<p>verify-number works!</p>
+<section>
+  <div class="d-flex flex-row">
+    <div class="mt-5 mx-auto">
+      <div class="card" style="width: 18rem">
+        <div class="card-body">
+          <h5 class="card-title">Enter Mobile Number</h5>
+          <h6 class="card-subtitle mb-2 text-muted">
+            Please register on cowin website before proceeding further
+          </h6>
+          <form
+            [formGroup]="numberForm"
+            action="submit"
+            (ngSubmit)="onSubmitForm()"
+          >
+            <div class="form-group">
+              <input
+                class="form-control my-2"
+                type="text"
+                formControlName="number"
+              />
+            </div>
+
+            <button
+              [disabled]="numberForm.invalid"
+              type="submit"
+              class="btn btn-primary btn-small"
+            >
+              Request OTP
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

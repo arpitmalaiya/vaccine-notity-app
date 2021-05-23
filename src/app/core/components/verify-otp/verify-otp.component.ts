@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-verify-otp',
@@ -7,9 +9,20 @@ import { Component, OnInit } from '@angular/core';
 })
 export class VerifyOtpComponent implements OnInit {
 
-  constructor() { }
+  otpForm:FormGroup
+  constructor(private router:Router,private fb:FormBuilder) { }
+
 
   ngOnInit(): void {
+   this.otpForm = this.fb.group({
+    otp: ['', [Validators. required]]
+   })
+    
   }
+  
 
+  onSubmitForm(){
+    console.log(this.otpForm);
+    this.router.navigate(["/verify-otp"])
+  }
 }
