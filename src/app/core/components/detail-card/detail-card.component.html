@@ -1,0 +1,51 @@
+<div *ngIf="centerDataFiltered.sessions.length" class="card mb-2">
+  <div class="card-header bg-dark text-white">
+    {{ centerDataFiltered.name }}
+  </div>
+  <div class="card-body">
+    <h5 class="card-title">Block : {{ centerDataFiltered.block_name }}</h5>
+    <table class="table table-borderless table-sm">
+      <tbody>
+        <tr>
+          <td>Address</td>
+          <td>{{ centerDataFiltered.address }}</td>
+        </tr>
+        <tr>
+          <td>District</td>
+          <td>{{ centerDataFiltered.district_name }}</td>
+        </tr>
+        <tr>
+          <td>State</td>
+          <td>{{ centerDataFiltered.state_name }}</td>
+        </tr>
+        <tr>
+          <td>pincode</td>
+          <td>{{ centerDataFiltered.pincode }}</td>
+        </tr>
+        <tr>
+          <td>Fee</td>
+          <td>{{ centerDataFiltered.fee_type }}</td>
+        </tr>
+      </tbody>
+    </table>
+    <h6 class="card-text">Slot Availiblity</h6>
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Dose 1</th>
+          <th>Dose 2</th>
+          <th>Min Age</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let data of centerDataFiltered.sessions">
+          <td>{{ data.date }}</td>
+          <td>{{ data.available_capacity_dose1 }}</td>
+          <td>{{ data.available_capacity_dose2 }}</td>
+          <td>{{ data.min_age_limit }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

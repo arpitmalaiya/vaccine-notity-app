@@ -1,1 +1,158 @@
-<p>dashboard works!</p>
+<section class="mt-3">
+  <h5>Select an option to proceed</h5>
+  <form [formGroup]="searchForm" action="submit" (ngSubmit)="onSubmitForm()">
+    <div class="form-check">
+      <input
+        class="form-check-input"
+        type="radio"
+        formControlName="selectTypeRadio"
+        id="flexRadioDefault1"
+        value="byPin"
+      />
+      <label class="form-check-label" for="flexRadioDefault1">
+        Search by Pin
+      </label>
+    </div>
+    <div class="form-check">
+      <input
+        class="form-check-input"
+        type="radio"
+        formControlName="selectTypeRadio"
+        id="flexRadioDefault2"
+        value="byDistrict"
+      />
+      <label class="form-check-label" for="flexRadioDefault2">
+        Search by District
+      </label>
+    </div>
+    <div
+      *ngIf="searchForm.value.selectTypeRadio == 'byPin'"
+      id="byPincode"
+      class="form-row mt-4 row"
+    >
+      <div class="col-12 col-sm-6 col-md-6 col-lg-4">
+        <input
+          type="text"
+          class="form-control"
+          formControlName="pinCode"
+          placeholder="Enter Pin"
+        />
+      </div>
+    </div>
+    <div
+      *ngIf="searchForm.value.selectTypeRadio == 'byDistrict'"
+      id="byDistrict"
+      class="form-row mt-3 row"
+    >
+      <div class="col-12 col-sm-6 col-md-6 col-lg-4 mt-1">
+        <select
+          class="form-control"
+          formControlName="state"
+          (change)="onSelectState()"
+        >
+          <option value="">Select State</option>
+          <option *ngFor="let state of states" [ngValue]="state.state_id">
+            {{ state.state_name }}
+          </option>
+        </select>
+      </div>
+      <div class="col-12 col-sm-6 col-md-6 col-lg-4 mt-1">
+        <select class="form-control" formControlName="district">
+          <option value="">Select District</option>
+          <option *ngFor="let dist of districts" [ngValue]="dist.district_id">
+            {{ dist.district_name }}
+          </option>
+        </select>
+      </div>
+    </div>
+
+    <div class="my-2">
+      <button class="btn btn-secondary">Search</button>
+    </div>
+    <hr />
+    <div *ngIf="allDataByPin.length" class="form-row mt-2 row">
+      <div class="col-4 col-sm-3 col-md-2">
+        <div class="form-check">
+          <input
+            class="form-check-input"
+            type="checkbox"
+            name="fChecks"
+            (change)="onCheckboxChangeAge($event)"
+            value="18"
+          />
+          <label class="form-check-label" for="flexCheckDefault"> 18+ </label>
+        </div>
+        <div class="form-check">
+          <input
+            class="form-check-input"
+            type="checkbox"
+            name="fChecks"
+            (change)="onCheckboxChangeAge($event)"
+            value="45"
+          />
+          <label class="form-check-label" for="flexCheckChecked"> 45+ </label>
+        </div>
+      </div>
+      <div class="col-4 col-sm-3 col-md-2">
+        <div class="form-check">
+          <input
+            class="form-check-input"
+            type="checkbox"
+            name="fChecks"
+            (change)="onCheckboxChangeDose($event)"
+            value="dose1"
+          />
+          <label class="form-check-label" for="flexCheckDefault">
+            Dose 1
+          </label>
+        </div>
+        <div class="form-check">
+          <input
+            class="form-check-input"
+            type="checkbox"
+            name="fChecks"
+            (change)="onCheckboxChangeDose($event)"
+            value="dose2"
+          />
+          <label class="form-check-label" for="flexCheckChecked">
+            Dose 2
+          </label>
+        </div>
+      </div>
+      <div class="col-4 col-sm-3 col-md-2">
+        <div class="form-check">
+          <input
+            class="form-check-input"
+            type="checkbox"
+            name="fChecks"
+            (change)="onCheckboxChangeFee($event)"
+            value="Free"
+          />
+          <label class="form-check-label" for="flexCheckDefault">Free</label>
+        </div>
+        <div class="form-check">
+          <input
+            class="form-check-input"
+            type="checkbox"
+            name="fChecks"
+            (change)="onCheckboxChangeFee($event)"
+            value="Paid"
+          />
+          <label class="form-check-label" for="flexCheckChecked">Paid</label>
+        </div>
+      </div>
+    </div>
+  </form>
+  <button (click)="notify()" class="btn btn-danger d-none">Push</button>
+</section>
+<section class="mt-4 row">
+  <div *ngFor="let data of allDataByPin" class="col-12 col-sm-6 col-lg-4">
+    <app-detail-card
+      [centerData]="data"
+      (emptyValue)="isEmptyCheck($event)"
+    ></app-detail-card>
+  </div>
+  <div *ngIf="isEmpty">
+    <p class="display-4 text-center">No Matching Entries</p>
+  </div>
+</section>

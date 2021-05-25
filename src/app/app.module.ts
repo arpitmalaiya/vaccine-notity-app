@@ -11,6 +11,9 @@ import { VerifyNumberComponent } from './core/components/verify-number/verify-nu
 import { VerifyOtpComponent } from './core/components/verify-otp/verify-otp.component';
 import { SlotOverviewComponent } from './core/components/slot-overview/slot-overview.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import {HttpClientModule, HTTP_INTERCEPTORS} from '@angular/common/http';
+import { AuthInterceptorService } from 'src/app/shared/auth-interceptor.service';
+import { DetailCardComponent } from './core/components/detail-card/detail-card.component'
 
 @NgModule({
   declarations: [
@@ -21,16 +24,24 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
     DashboardComponent,
     VerifyNumberComponent,
     VerifyOtpComponent,
-    SlotOverviewComponent
+    SlotOverviewComponent,
+    DetailCardComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    HttpClientModule
   ],
   schemas:[CUSTOM_ELEMENTS_SCHEMA],
-  providers: [],
+  providers: [
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptorService,
+      multi: true
+    }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
