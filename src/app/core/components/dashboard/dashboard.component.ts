@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ApiUrlService } from 'src/app/shared/api-url.service';
@@ -9,18 +9,25 @@ import { PushNotificationsService } from 'src/app/shared/push-notifications.serv
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss']
 })
-export class DashboardComponent implements OnInit {
+export class DashboardComponent implements OnInit,OnDestroy {
 
   todayDate;
+  showTime;
   searchForm:FormGroup
   states:any[] ;
   districts:any[];
   allDataByPin: any[] = [];
   filterPara: any;
   isEmpty: boolean = false;
+  intervalNotify:any
+  dataPrevious: any[] = [];
+  dataCurrent: any[] = [];
+  searchClicked: boolean = false;
+  isFilterEnabled = false;
+
 
   constructor(private router:Router,private fb:FormBuilder,private apiService:ApiUrlService,private _notificationService: PushNotificationsService) { 
-    this._notificationService.requestPermission();
+    
   }
 
   ngOnInit(): void {
@@ -42,46 +49,31 @@ export class DashboardComponent implements OnInit {
 
     let date = new Date();
    this.todayDate = date.getDate() + '-' + (date.getMonth()+1) + '-' + date.getFullYear(); 
+    this.showTime = date.toLocaleTimeString();
     
   }
   onSelectState(){
-    console.log(this.searchForm.value.state);
     this.apiService.getDistrictData(this.searchForm.value.state).subscribe(
       res=>{
         this.districts = res.districts
       }
     )
   }
-  notify() {
-    let data: Array < any >= [];
-    data.push({
-        'title': 'Approval',
-        'alertContent': 'This is First Alert -- By Debasis Saha'
-    });
-    data.push({
-        'title': 'Request',
-        'alertContent': 'This is Second Alert -- By Debasis Saha'
-    });
-    data.push({
-        'title': 'Leave Application',
-        'alertContent': 'This is Third Alert -- By Debasis Saha'
-    });
-    data.push({
-        'title': 'Approval',
-        'alertContent': 'This is Fourth Alert -- By Debasis Saha'
-    });
-    data.push({
-        'title': 'To Do Task',
-        'alertContent': 'This is Fifth Alert -- By Debasis Saha'
-    });
 
-    this._notificationService.generateNotification(data);
-}
+  allNewDataPush = [];
+  allNewBanner = [];
+  receiveNoti(e:any){
+    let pushNoti = e.newPushData
+    let bannerNoti = e.newBannerData
+    this.allNewDataPush.push(...pushNoti);
+    this.allNewBanner.push(...bannerNoti);
+    this._notificationService.generateNotification(this.allNewDataPush);
+  }
 
   
 
   onSubmitForm(){
-    console.log(this.searchForm);
+    this.searchClicked = true;
       var e:any = document.getElementsByName('fChecks');
       e.forEach(ele => {
         ele.checked =false;
@@ -95,25 +87,77 @@ export class DashboardComponent implements OnInit {
       checkArrayFee.clear();
     
     
+    this.apiCalls();
     
+  }
+  apiCalls(){
+    this.apiService.invokeFilterMethodClick(
+      {
+        'ageFilter': [],
+        'doseFilter': [],
+        'feeFilter': []
+      }
+    );
     if(this.searchForm.value.selectTypeRadio == "byPin"){
-      this.apiService.getDetailsByPin(this.searchForm.value.pinCode,this.todayDate).subscribe(
-        res=>{
-          console.log(res);
-          this.allDataByPin = res.centers;
-        }
-      )
+      if(this.searchForm.value.pinCode == '000000'){
+        this.apiService.getDetailsByPinTest(this.searchForm.value.pinCode,this.todayDate).subscribe(
+          res=>{
+            this.isEmpty = false;
+            this.dataCurrent = res;
+            //this.dataCurrent = this.allDataByPin;
+            
+            setTimeout(() => {
+              this.dataPrevious = this.dataCurrent;
+            }, 4000);
+          },
+          err=>{
+            this.isEmpty = true;
+          }
+        )
+      }
+      else{
+        this.apiService.getDetailsByPin(this.searchForm.value.pinCode,this.todayDate).subscribe(
+          res=>{
+            this.isEmpty = false
+            this.dataCurrent = res.centers;
+            //this.dataCurrent = this.allDataByPin;
+            
+            setTimeout(() => {
+              this.dataPrevious = this.dataCurrent;
+            }, 4000);
+          },
+          err=>{
+            this.isEmpty = true;
+          }
+        )
+      }
     }
     else if(this.searchForm.value.selectTypeRadio == "byDistrict"){
       this.apiService.getDetailsByDist(this.searchForm.value.district,this.todayDate).subscribe(
         res=>{
-          console.log(res);
+          this.isEmpty = false
           this.allDataByPin = res.centers;
-          
+          this.dataCurrent = this.allDataByPin;
+        },
+        err=>{
+          this.isEmpty = true;
         }
       )
     }
   }
+  // checkFilterEnable(){
+  //   let eleCheck:any
+  //   eleCheck = document.getElementsByName('fChecks');
+  //   for(var i = 0; i < eleCheck.length ; i++){
+  //     if(eleCheck[i].target.checked){
+  //       this.isFilterEnabled = true;
+  //       break;
+  //     }
+  //     else{
+  //       this.isFilterEnabled = false;
+  //     }
+  //   };
+  // }
   onCheckboxChangeDose(e) {
     const checkArrayDose: FormArray = this.searchForm.get('checkArrayDose') as FormArray;
   
@@ -185,9 +229,30 @@ export class DashboardComponent implements OnInit {
       }
     );
   }
+  isEmptyArr = [];
   isEmptyCheck(e:any){
-    console.log(e);
+    // this.isEmptyArr.push(e)
+
+    // if(!e){
+    //   this.isEmpty = false;
+    // }
     
-    this.isEmpty = e;
+  }
+  getNotify(){
+    this._notificationService.requestPermission();
+    this.dataPrevious = this.dataCurrent;
+    this.intervalNotify =  setInterval(()=>{
+      this.apiCalls();
+      this.allNewDataPush = [];
+    },7000)
+    this.apiService.invokeNotificationClick(true);
+  }
+  stopNotify(){
+    clearInterval(this.intervalNotify);
+    this.apiService.invokeNotificationClick(false);
+    this.allNewBanner=[];
+  }
+  ngOnDestroy(){
+    clearInterval(this.intervalNotify);
   }
 }

@@ -35,13 +35,13 @@ import { DetailCardComponent } from './core/components/detail-card/detail-card.c
     HttpClientModule
   ],
   schemas:[CUSTOM_ELEMENTS_SCHEMA],
-  providers: [
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: AuthInterceptorService,
-      multi: true
-    }
-  ],
+  // providers: [
+  //   {
+  //     provide: HTTP_INTERCEPTORS,
+  //     useClass: AuthInterceptorService,
+  //     multi: true
+  //   }
+  // ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

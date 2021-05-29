@@ -65,7 +65,7 @@ export class PushNotificationsService {
       source.forEach((item) => {
           let options = {
               body: item.alertContent,
-              
+              icon: "../assets/covid-vaccine-icon.png"
           };
           let notify = self.create(item.title, options).subscribe();
       })

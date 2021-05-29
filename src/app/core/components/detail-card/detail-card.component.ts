@@ -10,29 +10,77 @@ import { ApiUrlService } from 'src/app/shared/api-url.service';
 export class DetailCardComponent implements OnInit,OnDestroy {
 
   @Input() centerData:any;
+  @Input() oldData:any;
   @Output() emptyValue = new EventEmitter;
+  @Output() newNotification = new EventEmitter;
   filterPara :any;
   triggerSub:Subscription;
+  triggerNotiSub:Subscription;
   centerDataFiltered:any;
+  oldDataFiltered:any;
+  dataPrevious;
+  dataCurrent;
+  isFilterEnabled = false;
   
   constructor(private apiService: ApiUrlService) { }
 
   ngOnInit(): void {
+    // console.log(this.oldData);
+    // console.log(this.centerData);
+    
     this.centerDataFiltered = this.centerData
-   this.triggerSub = this.apiService.invokeFilterFunction.subscribe(
+    this.oldDataFiltered = this.oldData
+    this.triggerSub = this.apiService.getfiltersData.subscribe(
       res=>{     
-        console.log(res);
         this.filterPara = res;
+        this.isFilterEnabled = (this.filterPara.ageFilter.length + this.filterPara.doseFilter.length + this.filterPara.feeFilter.length) >0 ? true : false
         this.centerDataFiltered = this.filterByFee(this.filterByDose(this.filterByAge(this.centerData)));
         if(!this.centerDataFiltered.sessions.length){
-          this.emptyValue.emit(true);
+          //this.emptyValue.emit(true);
         }
         else{
-          this.emptyValue.emit(false);
+          //this.emptyValue.emit(false);
           
+        }
+
+        if(this.apiService.getNotifyStatus()){
+          this.oldDataFiltered = this.filterByFee(this.filterByDose(this.filterByAge(this.oldData)));
         }
       }
     )
+    
+    if(this.apiService.getNotifyStatus()){
+      this.checkNewValue(this.oldDataFiltered, this.centerDataFiltered)
+    }
+  
+  }
+
+  checkNewValue(previousD:any, nextD:any){
+    let newPushData:any[] = [];
+    let newBannerData:any[] = [];
+    
+    for(var i = 0; i < previousD.sessions.length;i++){
+      if((previousD.sessions[i].available_capacity_dose1 == 0 && nextD.sessions[i].available_capacity_dose1 > 0)||(previousD.sessions[i].available_capacity_dose2 == 0 && nextD.sessions[i].available_capacity_dose2 > 0)){
+        newPushData.push({
+          'title': nextD.name,
+          'alertContent': `D1 : ${nextD.sessions[i].available_capacity_dose1}, D2 : ${nextD.sessions[i].available_capacity_dose2}, Age:${nextD.sessions[i].min_age_limit}+ , ${nextD.fee_type}`
+        })
+
+        newBannerData.push({
+          "name": nextD.name,    
+          "address": nextD.address,
+          "district_name": nextD.district_name,
+          "block_name": nextD.block_name,
+          "fee_type": nextD.fee_type,
+          "date": nextD.sessions[i].date,
+          "min_age_limit": nextD.sessions[i].min_age_limit,
+          "available_capacity_dose1": nextD.sessions[i].available_capacity_dose1,
+          "available_capacity_dose2": nextD.sessions[i].available_capacity_dose2
+        })
+
+        this.newNotification.emit({newPushData , newBannerData})
+      }
+    }
   }
 
   filterByAge(data:any){
@@ -72,19 +120,19 @@ export class DetailCardComponent implements OnInit,OnDestroy {
     if(this.filterPara.doseFilter.length){
       data.sessions.forEach(ele => {
 
-        if(this.filterPara.doseFilter.indexOf('dose1')>=0 && this.filterPara.doseFilter.indexOf('dose2')>=0 ){
+        if(this.filterPara.doseFilter.indexOf('available_capacity_dose1')>=0 && this.filterPara.doseFilter.indexOf('available_capacity_dose2')>=0 ){
           if(ele.available_capacity_dose1>0 && ele.available_capacity_dose2>0){
             fSessionData.push(ele)
           }
         }
 
-        if(this.filterPara.doseFilter.indexOf('dose1')>=0 && this.filterPara.doseFilter.indexOf('dose2')==-1){
+        if(this.filterPara.doseFilter.indexOf('available_capacity_dose1')>=0 && this.filterPara.doseFilter.indexOf('available_capacity_dose2')==-1){
           if(ele.available_capacity_dose1>0){
             fSessionData.push(ele)
           }
         }
 
-        if(this.filterPara.doseFilter.indexOf('dose2')>=0 && this.filterPara.doseFilter.indexOf('dose1')==-1){
+        if(this.filterPara.doseFilter.indexOf('available_capacity_dose2')>=0 && this.filterPara.doseFilter.indexOf('available_capacity_dose1')==-1){
           if( ele.available_capacity_dose2>0){
             fSessionData.push(ele)
           }
@@ -145,5 +193,6 @@ export class DetailCardComponent implements OnInit,OnDestroy {
 
   ngOnDestroy(){
     this.triggerSub.unsubscribe();
+    //this.triggerNotiSub.unsubscribe();
   }
 }

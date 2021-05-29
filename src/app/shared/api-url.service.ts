@@ -1,17 +1,33 @@
 import { EventEmitter, Injectable } from '@angular/core';
 import {HttpClient} from "@angular/common/http";
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ApiUrlService {
 
+  isNotify:boolean =false;
+  filters:any;
+
   constructor(private https:HttpClient) { }
 
-  invokeFilterFunction = new EventEmitter(); 
+  invokeFilterFunction = new BehaviorSubject<any>(''); 
+  public getfiltersData = this.invokeFilterFunction.asObservable();
+  //invokeNotification = new Subject(); 
 
   invokeFilterMethodClick(filterData:any){
-    this.invokeFilterFunction.emit(filterData);
+    this.filters = filterData;
+    this.invokeFilterFunction.next(filterData);
+  }
+  getHeroes(): Observable<any> {
+    return this.filters;
+  }
+  invokeNotificationClick(para:boolean){
+    this.isNotify = para;
+  }
+  getNotifyStatus(){
+    return this.isNotify;
   }
 
   sendOtp(data:any) {
@@ -42,6 +58,13 @@ export class ApiUrlService {
   getDetailsByDist(distId:string,date:string){
     return this.https.get<any>(
       'https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByDistrict?district_id='+distId+ '&date=' + date
+    )
+  }
+
+  //test api call
+  getDetailsByPinTest(pin:string,date:string){
+    return this.https.get<any>(
+      'https://vaccine-test-api-default-rtdb.firebaseio.com/centers.json'
     )
   }
 }
