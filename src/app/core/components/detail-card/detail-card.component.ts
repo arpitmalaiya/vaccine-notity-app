@@ -75,7 +75,8 @@ export class DetailCardComponent implements OnInit,OnDestroy {
           "date": nextD.sessions[i].date,
           "min_age_limit": nextD.sessions[i].min_age_limit,
           "available_capacity_dose1": nextD.sessions[i].available_capacity_dose1,
-          "available_capacity_dose2": nextD.sessions[i].available_capacity_dose2
+          "available_capacity_dose2": nextD.sessions[i].available_capacity_dose2,
+          "currentTime": `${new Date().getHours()}:${new Date().getMinutes()}:${new Date().getSeconds()}`
         })
 
         this.newNotification.emit({newPushData , newBannerData})

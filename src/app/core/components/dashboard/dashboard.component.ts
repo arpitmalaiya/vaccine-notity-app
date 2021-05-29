@@ -12,6 +12,7 @@ import { PushNotificationsService } from 'src/app/shared/push-notifications.serv
 export class DashboardComponent implements OnInit,OnDestroy {
 
   todayDate;
+  date = new Date();
   showTime;
   searchForm:FormGroup
   states:any[] ;
@@ -47,9 +48,8 @@ export class DashboardComponent implements OnInit,OnDestroy {
       }
     )
 
-    let date = new Date();
-   this.todayDate = date.getDate() + '-' + (date.getMonth()+1) + '-' + date.getFullYear(); 
-    this.showTime = date.toLocaleTimeString();
+    
+   this.todayDate = this.date.getDate() + '-' + (this.date.getMonth()+1) + '-' + this.date.getFullYear(); 
     
   }
   onSelectState(){
@@ -61,8 +61,9 @@ export class DashboardComponent implements OnInit,OnDestroy {
   }
 
   allNewDataPush = [];
-  allNewBanner = [];
+  allNewBanner = <any>[];
   receiveNoti(e:any){
+    //this.showTime = this.date.toLocaleTimeString();
     let pushNoti = e.newPushData
     let bannerNoti = e.newBannerData
     this.allNewDataPush.push(...pushNoti);
@@ -70,6 +71,11 @@ export class DashboardComponent implements OnInit,OnDestroy {
     this._notificationService.generateNotification(this.allNewDataPush);
   }
 
+  dismissCard(index:number){
+    console.log(index);
+    
+    this.allNewBanner.splice(index,1);
+  }
   
 
   onSubmitForm(){

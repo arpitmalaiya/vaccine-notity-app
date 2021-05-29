@@ -194,11 +194,17 @@
         <div class="row no-gutters my-auto">
           <div
             class="col-12 col-md-6 col-lg-4 px-1 py-1"
-            *ngFor="let data of allNewBanner"
+            *ngFor="let data of allNewBanner; let i = index"
           >
             <div class="card">
               <div class="card-body">
-                <h6 class="card-subtitle mb-2">{{ data.name }}</h6>
+                <div class="row no-gutters mb-2">
+                  <h6 class="card-subtitle my-auto">{{ data.name }}</h6>
+                  <span class="ml-auto"
+                    ><a (click)="dismissCard(i)"
+                      ><i class="icon ion-ios-trash-outline"></i></a
+                  ></span>
+                </div>
                 <table class="table table-borderless mb-0 table-sm">
                   <tbody>
                     <tr>
@@ -237,7 +243,7 @@
                 </table>
               </div>
               <div class="card-footer text-muted text-center py-1">
-                {{ showTime }}
+                {{ data.currentTime }}
               </div>
             </div>
           </div>
@@ -250,14 +256,14 @@
       </div>
       <div class="modal-footer justify-content-start d-block py-1">
         <div class="row no-gutters">
-          <div class="col-10">
+          <div class="col-12 col-md-8 col-lg-10">
             <p>Click the X button to stop receiving notification</p>
           </div>
-          <div class="col-2">
+          <div class="col">
             <a
               target="_blank"
               href="https://selfregistration.cowin.gov.in/"
-              class="card-link btn btn-link"
+              class="btn btn-link"
             >
               CoWin Portal
             </a>
