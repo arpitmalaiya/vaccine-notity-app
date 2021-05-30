@@ -8,6 +8,7 @@
   >
     <div class="form-check">
       <input
+        (change)="toggleWay($event.target.value)"
         class="form-check-input"
         type="radio"
         formControlName="selectTypeRadio"
@@ -20,6 +21,7 @@
     </div>
     <div class="form-check">
       <input
+        (change)="toggleWay($event.target.value)"
         class="form-check-input"
         type="radio"
         formControlName="selectTypeRadio"
@@ -72,10 +74,31 @@
     </div>
 
     <div class="my-2">
-      <button class="btn btn-secondary">Search</button>
+      <button [disabled]="searchForm.invalid" class="btn btn-dark">
+        Search
+      </button>
     </div>
-    <hr />
-    <div *ngIf="dataCurrent.length" class="form-row mt-2 row">
+
+    <hr class="mb-1" />
+    <div
+      *ngIf="dataCurrent.length && !isEmpty"
+      class="text-monospace text-muted"
+    >
+      <small>
+        This only shows the availablity of vaccine slots. For booking go to
+        <span
+          ><a
+            target="_blank"
+            href="https://selfregistration.cowin.gov.in/"
+            class="btn btn-link px-0 py-0"
+          >
+            Cowin
+          </a></span
+        >
+        portal.
+      </small>
+    </div>
+    <div *ngIf="dataCurrent.length && !isEmpty" class="form-row mt-2 row">
       <div class="col-4 col-sm-3 col-md-2">
         <div class="form-check">
           <input
@@ -149,7 +172,7 @@
     </div>
   </form>
 </section>
-<section class="mt-4 row">
+<section *ngIf="!isEmpty" class="mt-4 row">
   <div
     *ngFor="let data of dataCurrent; let i = index"
     class="col-12 col-sm-6 col-lg-4"
@@ -163,7 +186,7 @@
   </div>
 </section>
 <div *ngIf="isEmpty">
-  <p class="h5 text-warning text-center">No Data Found</p>
+  <p class="h5 text-warning text-center pt-2">No Data Found</p>
 </div>
 <section *ngIf="searchClicked && !isEmpty" class="text-center my-3">
   <p class="mb-0">Didn't find your center?</p>
@@ -175,6 +198,7 @@
       data-toggle="modal"
       data-target="#myModal"
       class="text-primary"
+      id="trigger-modal"
       >here</a
     >
   </p>

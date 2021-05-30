@@ -1,6 +1,7 @@
 import { EventEmitter, Injectable } from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { catchError, tap } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -12,6 +13,9 @@ export class ApiUrlService {
 
   constructor(private https:HttpClient) { }
 
+  triggerNotification = new EventEmitter(); 
+  isDataAvailable = new BehaviorSubject<any>(''); 
+
   invokeFilterFunction = new BehaviorSubject<any>(''); 
   public getfiltersData = this.invokeFilterFunction.asObservable();
   //invokeNotification = new Subject(); 
@@ -20,14 +24,14 @@ export class ApiUrlService {
     this.filters = filterData;
     this.invokeFilterFunction.next(filterData);
   }
-  getHeroes(): Observable<any> {
-    return this.filters;
-  }
   invokeNotificationClick(para:boolean){
     this.isNotify = para;
   }
   getNotifyStatus(){
     return this.isNotify;
+  }
+  clickTriggerNotification(){
+    this.triggerNotification.next()
   }
 
   sendOtp(data:any) {
@@ -53,18 +57,39 @@ export class ApiUrlService {
   getDetailsByPin(pin:string,date:string){
     return this.https.get<any>(
       'https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByPin?pincode='+pin+ '&date=' + date
-    )
+    ).pipe(
+      tap((resData) => {
+        this.isDataAvailable.next(true)
+      },
+      err=>{
+        this.isDataAvailable.next(false)
+      })
+    );
   }
   getDetailsByDist(distId:string,date:string){
     return this.https.get<any>(
       'https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByDistrict?district_id='+distId+ '&date=' + date
-    )
+    ).pipe(
+      tap((resData) => {
+        this.isDataAvailable.next(true)
+      },
+      err=>{
+        this.isDataAvailable.next(false)
+      })
+    );
   }
 
   //test api call
   getDetailsByPinTest(pin:string,date:string){
     return this.https.get<any>(
       'https://vaccine-test-api-default-rtdb.firebaseio.com/centers.json'
-    )
+    ).pipe(
+      tap((resData) => {
+        this.isDataAvailable.next(true)
+      },
+      err=>{
+        this.isDataAvailable.next(false)
+      })
+    );
   }
 }

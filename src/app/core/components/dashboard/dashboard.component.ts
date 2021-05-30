@@ -36,7 +36,7 @@ export class DashboardComponent implements OnInit,OnDestroy {
       selectTypeRadio: ['byPin'],
       state:[''],
       district:[''],
-      pinCode:[''],
+      pinCode:['',[Validators.minLength(6),Validators.required]],
       checkArrayAge: this.fb.array([]),
       checkArrayFee: this.fb.array([]),
       checkArrayDose: this.fb.array([]),
@@ -48,6 +48,12 @@ export class DashboardComponent implements OnInit,OnDestroy {
       }
     )
 
+    this.apiService.triggerNotification.subscribe(
+      res=>{
+        var ele:any =  document.getElementById('trigger-modal');
+        ele.click();
+      }
+    )
     
    this.todayDate = this.date.getDate() + '-' + (this.date.getMonth()+1) + '-' + this.date.getFullYear(); 
     
@@ -72,8 +78,6 @@ export class DashboardComponent implements OnInit,OnDestroy {
   }
 
   dismissCard(index:number){
-    console.log(index);
-    
     this.allNewBanner.splice(index,1);
   }
   
@@ -150,6 +154,21 @@ export class DashboardComponent implements OnInit,OnDestroy {
         }
       )
     }
+  }
+  toggleWay(value){
+    if(value == 'byDistrict'){
+      this.searchForm.controls.state.setValidators([Validators.required]);
+      this.searchForm.controls.district.setValidators([Validators.required]);
+      this.searchForm.controls.pinCode.clearValidators();
+    }
+    else if(value == 'byPin'){
+      this.searchForm.controls.state.clearValidators();
+      this.searchForm.controls.district.clearValidators();
+      this.searchForm.controls.pinCode.setValidators([Validators.min(6),Validators.required])
+    }
+    this.searchForm.controls.state.updateValueAndValidity();
+    this.searchForm.controls.district.updateValueAndValidity();
+    this.searchForm.controls.pinCode.updateValueAndValidity();
   }
   // checkFilterEnable(){
   //   let eleCheck:any

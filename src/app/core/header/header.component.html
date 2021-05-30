@@ -1,7 +1,24 @@
 <div class="">
   <nav class="navbar navbar-dark bg-dark">
     <div class="container">
-      <a class="navbar-brand" routerLink="/"> Get Your Jab ! </a>
+      <a class="navbar-brand" routerLink="/">
+        <img
+          src="../../../assets/covid-vaccine-icon.png"
+          width="30"
+          height="30"
+          class="d-inline-block align-top mr-2"
+          alt=""
+        />
+        Get Your Shot !
+      </a>
+      <ul *ngIf="isDataAvailable" class="navbar-nav ml-auto mt-lg-0">
+        <li class="nav-item active">
+          <a class="nav-link" (click)="clickBell()"
+            ><i class="icon ion-android-notifications mr-2"></i>
+            <span class="d-none d-md-inline">Notify me !</span></a
+          >
+        </li>
+      </ul>
     </div>
   </nav>
 </div>
