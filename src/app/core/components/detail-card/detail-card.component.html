@@ -7,7 +7,18 @@
       'bg-danger': centerDataFiltered.sessions.length == 0
     }"
   >
-    {{ centerDataFiltered.name }}
+    <div class="row no-gutters">
+      <div class="col-11">{{ centerDataFiltered.name }}</div>
+      <div class="col-1">
+        <a
+          class=""
+          (click)="
+            clickBellIndi(centerDataFiltered.center_id, centerDataFiltered.name)
+          "
+          ><i class="icon ion-android-notifications mx-1"></i
+        ></a>
+      </div>
+    </div>
   </div>
   <div class="card-body">
     <h5 class="card-title">Block : {{ centerDataFiltered.block_name }}</h5>

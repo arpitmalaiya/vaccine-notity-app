@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { ApiUrlService } from 'src/app/shared/api-url.service';
 import { PushNotificationsService } from 'src/app/shared/push-notifications.service'
 
@@ -25,6 +26,9 @@ export class DashboardComponent implements OnInit,OnDestroy {
   dataCurrent: any[] = [];
   searchClicked: boolean = false;
   isFilterEnabled = false;
+  indiNotiCenter: any = null;
+  triggerNotificationSubs: Subscription;
+  getIndiNotiSubs: Subscription;
 
 
   constructor(private router:Router,private fb:FormBuilder,private apiService:ApiUrlService,private _notificationService: PushNotificationsService) { 
@@ -48,10 +52,23 @@ export class DashboardComponent implements OnInit,OnDestroy {
       }
     )
 
-    this.apiService.triggerNotification.subscribe(
+    this.triggerNotificationSubs =  this.apiService.triggerNotification.subscribe(
       res=>{
         var ele:any =  document.getElementById('trigger-modal');
         ele.click();
+      }
+    )
+
+    this.getIndiNotiSubs = this.apiService.getIndiNotiData.subscribe(
+      res=>{
+        console.log(res);
+        
+        if(!(res == "nullString") && res){
+          //open popup
+          this.indiNotiCenter =  res;
+          var ele:any =  document.getElementById('trigger-modal');
+          ele.click();
+        }
       }
     )
     
@@ -276,8 +293,11 @@ export class DashboardComponent implements OnInit,OnDestroy {
     clearInterval(this.intervalNotify);
     this.apiService.invokeNotificationClick(false);
     this.allNewBanner=[];
+    this.apiService.setIndiNotify(null);
   }
   ngOnDestroy(){
     clearInterval(this.intervalNotify);
+    this.triggerNotificationSubs.unsubscribe();
+    this.getIndiNotiSubs.unsubscribe();
   }
 }

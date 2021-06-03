@@ -9,6 +9,7 @@ import { catchError, tap } from 'rxjs/operators';
 export class ApiUrlService {
 
   isNotify:boolean =false;
+  indiNotify = null;
   filters:any;
 
   constructor(private https:HttpClient) { }
@@ -18,6 +19,9 @@ export class ApiUrlService {
 
   invokeFilterFunction = new BehaviorSubject<any>(''); 
   public getfiltersData = this.invokeFilterFunction.asObservable();
+
+  invokeIndiNoti = new BehaviorSubject<any>(''); 
+  public getIndiNotiData = this.invokeIndiNoti.asObservable();
   //invokeNotification = new Subject(); 
 
   invokeFilterMethodClick(filterData:any){
@@ -26,6 +30,19 @@ export class ApiUrlService {
   }
   invokeNotificationClick(para:boolean){
     this.isNotify = para;
+  }
+  setIndiNotify(value){
+    this.indiNotify = value;
+    if(value){
+      this.invokeIndiNoti.next(this.indiNotify);
+    }
+    else{
+      this.invokeIndiNoti.next('nullString');
+    }
+    
+  }
+  getSimpleIndiNotifyData(){
+    return this.indiNotify;
   }
   getNotifyStatus(){
     return this.isNotify;
