@@ -21,6 +21,7 @@ export class DetailCardComponent implements OnInit,OnDestroy {
   dataPrevious;
   dataCurrent;
   isFilterEnabled = false;
+  indiNotiCenter: any =null;
   
   constructor(private apiService: ApiUrlService) { }
 
@@ -30,6 +31,9 @@ export class DetailCardComponent implements OnInit,OnDestroy {
     
     this.centerDataFiltered = this.centerData
     this.oldDataFiltered = this.oldData
+    
+    this.indiNotiCenter =  this.apiService.getSimpleIndiNotifyData();
+
     this.triggerSub = this.apiService.getfiltersData.subscribe(
       res=>{     
         this.filterPara = res;
@@ -60,28 +64,38 @@ export class DetailCardComponent implements OnInit,OnDestroy {
     let newBannerData:any[] = [];
     
     for(var i = 0; i < previousD.sessions.length;i++){
-      if((previousD.sessions[i].available_capacity_dose1 == 0 && nextD.sessions[i].available_capacity_dose1 > 0)||(previousD.sessions[i].available_capacity_dose2 == 0 && nextD.sessions[i].available_capacity_dose2 > 0)){
-        newPushData.push({
-          'title': nextD.name,
-          'alertContent': `D1 : ${nextD.sessions[i].available_capacity_dose1}, D2 : ${nextD.sessions[i].available_capacity_dose2}, Age:${nextD.sessions[i].min_age_limit}+ , ${nextD.fee_type}`
-        })
-
-        newBannerData.push({
-          "name": nextD.name,    
-          "address": nextD.address,
-          "district_name": nextD.district_name,
-          "block_name": nextD.block_name,
-          "fee_type": nextD.fee_type,
-          "date": nextD.sessions[i].date,
-          "min_age_limit": nextD.sessions[i].min_age_limit,
-          "available_capacity_dose1": nextD.sessions[i].available_capacity_dose1,
-          "available_capacity_dose2": nextD.sessions[i].available_capacity_dose2,
-          "currentTime": `${new Date().getHours()}:${new Date().getMinutes()}:${new Date().getSeconds()}`
-        })
-
-        this.newNotification.emit({newPushData , newBannerData})
+      if(!this.indiNotiCenter ||  this.indiNotiCenter.centerID == previousD.center_id){
+        //check other things
+        if((previousD.sessions[i].available_capacity_dose1 == 0 && nextD.sessions[i].available_capacity_dose1 > 0)||(previousD.sessions[i].available_capacity_dose2 == 0 && nextD.sessions[i].available_capacity_dose2 > 0)){
+          newPushData.push({
+            'title': nextD.name,
+            'alertContent': `D1 : ${nextD.sessions[i].available_capacity_dose1}, D2 : ${nextD.sessions[i].available_capacity_dose2}, Age:${nextD.sessions[i].min_age_limit}+ , ${nextD.fee_type}`
+          })
+  
+          newBannerData.push({
+            "name": nextD.name,    
+            "address": nextD.address,
+            "district_name": nextD.district_name,
+            "block_name": nextD.block_name,
+            "fee_type": nextD.fee_type,
+            "date": nextD.sessions[i].date,
+            "min_age_limit": nextD.sessions[i].min_age_limit,
+            "available_capacity_dose1": nextD.sessions[i].available_capacity_dose1,
+            "available_capacity_dose2": nextD.sessions[i].available_capacity_dose2,
+            "currentTime": `${new Date().getHours()}:${new Date().getMinutes()}:${new Date().getSeconds()}`
+          })
+          
+          this.newNotification.emit({newPushData , newBannerData})
+        }
       }
     }
+    
+  }
+  clickBellIndi(centerID:any,centerName:any){
+    this.apiService.setIndiNotify({
+      centerID:centerID,
+      centerName:centerName
+    })
   }
 
   filterByAge(data:any){

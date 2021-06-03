@@ -209,7 +209,12 @@
   <div class="modal-dialog modal-lg modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Notifying</h5>
+        <h5 class="modal-title">
+          Notifying
+          <span class="" *ngIf="indiNotiCenter?.centerName"
+            ><small>- {{ indiNotiCenter?.centerName }}</small></span
+          >
+        </h5>
         <button (click)="stopNotify()" class="close" data-dismiss="modal">
           &times;
         </button>
