@@ -13,7 +13,8 @@ import { SlotOverviewComponent } from './core/components/slot-overview/slot-over
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import {HttpClientModule, HTTP_INTERCEPTORS} from '@angular/common/http';
 import { AuthInterceptorService } from 'src/app/shared/auth-interceptor.service';
-import { DetailCardComponent } from './core/components/detail-card/detail-card.component'
+import { DetailCardComponent } from './core/components/detail-card/detail-card.component';
+import { VaccineMeasuresComponent } from './core/components/vaccine-measures/vaccine-measures.component'
 
 @NgModule({
   declarations: [
@@ -25,7 +26,8 @@ import { DetailCardComponent } from './core/components/detail-card/detail-card.c
     VerifyNumberComponent,
     VerifyOtpComponent,
     SlotOverviewComponent,
-    DetailCardComponent
+    DetailCardComponent,
+    VaccineMeasuresComponent
   ],
   imports: [
     BrowserModule,
