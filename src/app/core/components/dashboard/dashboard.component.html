@@ -1,43 +1,416 @@
-<section class="mt-3">
-  <h5>Check your nearest vaccination center and slots availability</h5>
-  <form
-    [formGroup]="searchForm"
-    action="submit"
-    class="mt-3"
-    (ngSubmit)="onSubmitForm()"
-  >
-    <div class="form-check">
-      <input
-        (change)="toggleWay($event.target.value)"
-        class="form-check-input"
-        type="radio"
-        formControlName="selectTypeRadio"
-        id="flexRadioDefault1"
-        value="byPin"
-      />
-      <label class="form-check-label" for="flexRadioDefault1">
-        Search by Pin
-      </label>
+<form [formGroup]="searchForm" action="submit" (ngSubmit)="onSubmitForm()">
+  <section id="home-section">
+    <div class="dark-overlay">
+      <div class="home-inner container">
+        <div class="row">
+          <div class="col-lg-8 d-none d-lg-block py-1 px-3">
+            <app-vaccine-measures></app-vaccine-measures>
+          </div>
+
+          <div class="col-lg-4">
+            <div class="card bg-card-over text-center card-form">
+              <div class="card-body">
+                <h3>Enter Details</h3>
+                <p>
+                  Check your nearest vaccination center and slots availability
+                </p>
+                <div>
+                  <div class="options mt-5">
+                    <input
+                      formControlName="selectTypeRadio"
+                      (change)="toggleWay($event.target.value)"
+                      type="radio"
+                      id="click"
+                      class="hide"
+                      value="byPin"
+                    />
+                    <label for="click">By Pin</label>
+
+                    <input
+                      formControlName="selectTypeRadio"
+                      (change)="toggleWay($event.target.value)"
+                      type="radio"
+                      id="touch"
+                      class="hide"
+                      value="byDistrict"
+                    />
+                    <label for="touch">By District</label>
+                  </div>
+                  <div
+                    id="byPincode"
+                    *ngIf="searchForm.value.selectTypeRadio == 'byPin'"
+                    class="form-group"
+                  >
+                    <input
+                      type="text"
+                      class="form-control form-control-lg"
+                      formControlName="pinCode"
+                      placeholder="Pincode"
+                    />
+                  </div>
+                  <div
+                    *ngIf="searchForm.value.selectTypeRadio == 'byDistrict'"
+                    id="byState"
+                    class="form-group"
+                  >
+                    <select
+                      class="form-control form-control-lg"
+                      formControlName="state"
+                      (change)="onSelectState()"
+                    >
+                      <option value="">Select State</option>
+                      <option
+                        *ngFor="let state of states"
+                        [ngValue]="state.state_id"
+                      >
+                        {{ state.state_name }}
+                      </option>
+                    </select>
+                  </div>
+                  <div
+                    *ngIf="searchForm.value.selectTypeRadio == 'byDistrict'"
+                    id="byDistrict"
+                    class="form-group"
+                  >
+                    <select
+                      class="form-control form-control-lg"
+                      formControlName="district"
+                    >
+                      <option value="">Select District</option>
+                      <option
+                        *ngFor="let dist of districts"
+                        [ngValue]="dist.district_id"
+                      >
+                        {{ dist.district_name }}
+                      </option>
+                    </select>
+                  </div>
+                  <div>
+                    <button
+                      [disabled]="searchForm.invalid"
+                      class="btn btn-outline-light btn-block"
+                      type="submit"
+                    >
+                      Search
+                    </button>
+                  </div>
+                  <div *ngIf="isEmpty">
+                    <p class="h5 text-white text-center pt-4">No Data Found</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="form-check">
-      <input
-        (change)="toggleWay($event.target.value)"
-        class="form-check-input"
-        type="radio"
-        formControlName="selectTypeRadio"
-        id="flexRadioDefault2"
-        value="byDistrict"
-      />
-      <label class="form-check-label" for="flexRadioDefault2">
-        Search by District
-      </label>
+  </section>
+  <section class="explore-fiter-section" id="explore-fiter-section">
+    <div class="container">
+      <div class="row">
+        <div class="col text-center pb-5 pt-4">
+          <h1 *ngIf="dataCurrent.length && !isEmpty" class="display-4">
+            Filters
+          </h1>
+          <div
+            *ngIf="dataCurrent.length && !isEmpty"
+            class="form-row row justify-content-center py-4"
+          >
+            <div class="col-4 col-sm-3 col-md-2">
+              <div class="form-check">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  name="fChecks"
+                  (change)="onCheckboxChangeAge($event)"
+                  value="18"
+                />
+                <label class="form-check-label" for="flexCheckDefault">
+                  18+
+                </label>
+              </div>
+              <div class="form-check">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  name="fChecks"
+                  (change)="onCheckboxChangeAge($event)"
+                  value="45"
+                />
+                <label class="form-check-label" for="flexCheckChecked">
+                  45+
+                </label>
+              </div>
+            </div>
+            <div class="col-4 col-sm-3 col-md-2">
+              <div class="form-check">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  name="fChecks"
+                  (change)="onCheckboxChangeDose($event)"
+                  value="available_capacity_dose1"
+                />
+                <label class="form-check-label" for="flexCheckDefault">
+                  Dose 1
+                </label>
+              </div>
+              <div class="form-check">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  name="fChecks"
+                  (change)="onCheckboxChangeDose($event)"
+                  value="available_capacity_dose2"
+                />
+                <label class="form-check-label" for="flexCheckChecked">
+                  Dose 2
+                </label>
+              </div>
+            </div>
+            <div class="col-4 col-sm-3 col-md-2">
+              <div class="form-check">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  name="fChecks"
+                  (change)="onCheckboxChangeFee($event)"
+                  value="Free"
+                />
+                <label class="form-check-label" for="flexCheckDefault"
+                  >Free</label
+                >
+              </div>
+              <div class="form-check">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  name="fChecks"
+                  (change)="onCheckboxChangeFee($event)"
+                  value="Paid"
+                />
+                <label class="form-check-label" for="flexCheckChecked"
+                  >Paid</label
+                >
+              </div>
+            </div>
+          </div>
+          <small class="text-monospace">
+            This only shows the availablity of vaccine slots. For booking go to
+            <span
+              ><a
+                target="_blank"
+                href="https://selfregistration.cowin.gov.in/"
+                class="btn btn-link px-0 py-0"
+              >
+                Cowin
+              </a></span
+            >
+            portal.
+          </small>
+        </div>
+      </div>
     </div>
+  </section>
+</form>
+
+<section id="details-card-section" *ngIf="!isEmpty && searchClicked" class="">
+  <div class="dark-overlay">
+    <div class="home-inner container">
+      <div class="pt-4 row mx-auto">
+        <div
+          *ngFor="let data of dataCurrent; let i = index"
+          class="col-12 col-sm-6 col-lg-4 px-0 px-sm-2"
+        >
+          <app-detail-card
+            [centerData]="data"
+            [oldData]="dataPrevious[i]"
+            (emptyValue)="isEmptyCheck($event)"
+            (newNotification)="receiveNoti($event)"
+          ></app-detail-card>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<div
+  id="get-notify-link"
+  *ngIf="searchClicked && !isEmpty"
+  class="text-center py-3 text-monospace"
+>
+  <p class="mb-0">Didn't find your center?</p>
+  <p class="mb-0">
+    Get notified for upcoming slots, Click
+    <a
+      (click)="getNotify()"
+      data-backdrop="static"
+      data-toggle="modal"
+      data-target="#myModal"
+      class="text-primary"
+      id="trigger-modal"
+      >here</a
+    >
+  </p>
+</div>
+
+<!-- MODAL -->
+<div class="modal" id="myModal">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="spinner-border mr-3 d-none d-sm-block" role="status">
+          <span class="sr-only">Loading...</span>
+        </div>
+        <h5 class="modal-title">
+          Notifying
+          <span class="" *ngIf="indiNotiCenter?.centerName"
+            ><small>- {{ indiNotiCenter?.centerName }}</small></span
+          >
+        </h5>
+        <button
+          (click)="stopNotify()"
+          class="close text-white"
+          data-dismiss="modal"
+        >
+          &times;
+        </button>
+      </div>
+      <div class="modal-body body-empty">
+        <div class="row no-gutters my-auto">
+          <div
+            class="col-12 col-md-6 col-lg-4 px-1 py-1"
+            *ngFor="let data of allNewBanner; let i = index"
+          >
+            <div class="card border-dark">
+              <div class="card-body">
+                <div class="row no-gutters mb-2">
+                  <h6 class="card-subtitle my-auto">{{ data.name }}</h6>
+                  <span class="ml-auto"
+                    ><a (click)="dismissCard(i)"
+                      ><i class="icon ion-ios-trash-outline"></i></a
+                  ></span>
+                </div>
+                <table
+                  id="slot-table"
+                  class="table table-borderless mb-0 table-sm"
+                >
+                  <tbody>
+                    <tr>
+                      <td>{{ data.address }}</td>
+                    </tr>
+                    <tr>
+                      <td>{{ data.block_name }}, {{ data.district_name }}</td>
+                    </tr>
+                    <tr>
+                      <td>{{ data.date }}</td>
+                    </tr>
+                    <tr>
+                      <td>{{ data.min_age_limit }}+</td>
+                    </tr>
+                    <tr class="row no-gutters">
+                      <div class="col">
+                        <td>D1 : {{ data.available_capacity_dose1 }}</td>
+                      </div>
+                      <div class="col">
+                        <td>D2 : {{ data.available_capacity_dose2 }}</td>
+                      </div>
+                      <div class="col ml-auto text-right">
+                        <td class="badge badge-dark px-1">
+                          {{ data.fee_type }}
+                        </td>
+                      </div>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="card-footer text-muted text-center py-1">
+                {{ data.currentTime }}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div *ngIf="allNewBanner.length == 0" class="row no-gutters body-empty">
+          <div class="mx-auto my-auto h5 text-center text-sm-left">
+            New opened slots will be shown here
+          </div>
+        </div>
+        <div class="row d-sm-none mt-2">
+          <div class="lds-roller mx-auto">
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer justify-content-start d-block py-1">
+        <div class="row no-gutters">
+          <div
+            class="col-12 col-md-8 col-lg-10 my-auto text-center text-sm-left"
+          >
+            <p class="mb-0">
+              <small> Click the X button to stop receiving notification </small>
+            </p>
+          </div>
+          <div class="col text-center text-sm-right">
+            <a
+              target="_blank"
+              href="https://selfregistration.cowin.gov.in/"
+              class="btn btn-link px-0 py-0"
+            >
+              <small> CoWin Portal </small>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section *ngIf="false" class="mt-3 container">
+  <h5 class="text-center text-sm-left">
+    Check your nearest vaccination center and slots availability
+  </h5>
+  <form action="submit" class="mt-4" (ngSubmit)="onSubmitForm()">
+    <div class="row my-3 no-gutters">
+      <div class="form-check col col-sm-12 mx-4">
+        <input
+          (change)="toggleWay($event.target.value)"
+          class="form-check-input"
+          type="radio"
+          formControlName="selectTypeRadio"
+          id="flexRadioDefault1"
+          value="byPin"
+        />
+        <label class="form-check-label" for="flexRadioDefault1">
+          Search by Pin
+        </label>
+      </div>
+      <div class="form-check col col-sm-12 mx-4">
+        <input
+          (change)="toggleWay($event.target.value)"
+          class="form-check-input"
+          type="radio"
+          formControlName="selectTypeRadio"
+          id="flexRadioDefault2"
+          value="byDistrict"
+        />
+        <label class="form-check-label" for="flexRadioDefault2">
+          Search by District
+        </label>
+      </div>
+    </div>
+
     <div
       *ngIf="searchForm.value.selectTypeRadio == 'byPin'"
       id="byPincode"
       class="form-row mt-3 row"
     >
-      <div class="col-12 col-sm-6 col-md-6 col-lg-4">
+      <div class="col-12 col-sm-6 col-md-6 col-lg-4 my-1">
         <input
           type="text"
           class="form-control"
@@ -45,13 +418,21 @@
           placeholder="Enter Pin"
         />
       </div>
+      <div class="col-12 col-sm-2">
+        <button
+          [disabled]="searchForm.invalid"
+          class="btn btn-dark my-1 btn-block"
+        >
+          Search
+        </button>
+      </div>
     </div>
     <div
       *ngIf="searchForm.value.selectTypeRadio == 'byDistrict'"
       id="byDistrict"
       class="form-row mt-3 row"
     >
-      <div class="col-12 col-sm-6 col-md-6 col-lg-4 mt-1">
+      <div class="col-12 col-sm-6 col-md-6 col-lg-4 my-1">
         <select
           class="form-control"
           formControlName="state"
@@ -63,7 +444,7 @@
           </option>
         </select>
       </div>
-      <div class="col-12 col-sm-6 col-md-6 col-lg-4 mt-1">
+      <div class="col-12 col-sm-6 col-md-6 col-lg-4 my-1">
         <select class="form-control" formControlName="district">
           <option value="">Select District</option>
           <option *ngFor="let dist of districts" [ngValue]="dist.district_id">
@@ -71,12 +452,14 @@
           </option>
         </select>
       </div>
-    </div>
-
-    <div class="my-2">
-      <button [disabled]="searchForm.invalid" class="btn btn-dark">
-        Search
-      </button>
+      <div class="col-12 col-sm-2">
+        <button
+          [disabled]="searchForm.invalid"
+          class="btn btn-dark my-1 btn-block"
+        >
+          Search
+        </button>
+      </div>
     </div>
 
     <hr class="mb-1" />
@@ -172,135 +555,3 @@
     </div>
   </form>
 </section>
-<section *ngIf="!isEmpty" class="mt-4 row">
-  <div
-    *ngFor="let data of dataCurrent; let i = index"
-    class="col-12 col-sm-6 col-lg-4"
-  >
-    <app-detail-card
-      [centerData]="data"
-      [oldData]="dataPrevious[i]"
-      (emptyValue)="isEmptyCheck($event)"
-      (newNotification)="receiveNoti($event)"
-    ></app-detail-card>
-  </div>
-</section>
-<div *ngIf="isEmpty">
-  <p class="h5 text-warning text-center pt-2">No Data Found</p>
-</div>
-<section *ngIf="searchClicked && !isEmpty" class="text-center my-3">
-  <p class="mb-0">Didn't find your center?</p>
-  <p class="mb-0">
-    Get notified for upcoming slots, Click
-    <a
-      (click)="getNotify()"
-      data-backdrop="static"
-      data-toggle="modal"
-      data-target="#myModal"
-      class="text-primary"
-      id="trigger-modal"
-      >here</a
-    >
-  </p>
-</section>
-
-<!-- MODAL -->
-<div class="modal" id="myModal">
-  <div class="modal-dialog modal-lg modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">
-          Notifying
-          <span class="" *ngIf="indiNotiCenter?.centerName"
-            ><small>- {{ indiNotiCenter?.centerName }}</small></span
-          >
-        </h5>
-        <button (click)="stopNotify()" class="close" data-dismiss="modal">
-          &times;
-        </button>
-      </div>
-      <div class="modal-body body-empty">
-        <div class="row no-gutters my-auto">
-          <div
-            class="col-12 col-md-6 col-lg-4 px-1 py-1"
-            *ngFor="let data of allNewBanner; let i = index"
-          >
-            <div class="card">
-              <div class="card-body">
-                <div class="row no-gutters mb-2">
-                  <h6 class="card-subtitle my-auto">{{ data.name }}</h6>
-                  <span class="ml-auto"
-                    ><a (click)="dismissCard(i)"
-                      ><i class="icon ion-ios-trash-outline"></i></a
-                  ></span>
-                </div>
-                <table class="table table-borderless mb-0 table-sm">
-                  <tbody>
-                    <tr>
-                      <td>Address</td>
-                      <td>{{ data.address }}</td>
-                    </tr>
-                    <tr>
-                      <td>District</td>
-                      <td>{{ data.district_name }}</td>
-                    </tr>
-                    <tr>
-                      <td>Block</td>
-                      <td>{{ data.block_name }}</td>
-                    </tr>
-                    <tr>
-                      <td>Fee</td>
-                      <td>{{ data.fee_type }}</td>
-                    </tr>
-                    <tr>
-                      <td>Date</td>
-                      <td>{{ data.date }}</td>
-                    </tr>
-                    <tr>
-                      <td>Age</td>
-                      <td>{{ data.min_age_limit }}+</td>
-                    </tr>
-                    <tr>
-                      <td>D1</td>
-                      <td>{{ data.available_capacity_dose1 }}</td>
-                    </tr>
-                    <tr>
-                      <td>D2</td>
-                      <td>{{ data.available_capacity_dose2 }}</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-              <div class="card-footer text-muted text-center py-1">
-                {{ data.currentTime }}
-              </div>
-            </div>
-          </div>
-        </div>
-        <div *ngIf="allNewBanner.length == 0" class="row no-gutters body-empty">
-          <div class="mx-auto my-auto h5">
-            New opened slots will be shown here
-          </div>
-        </div>
-      </div>
-      <div class="modal-footer justify-content-start d-block py-1">
-        <div class="row no-gutters">
-          <div class="col-12 col-md-8 col-lg-10 my-auto">
-            <p class="mb-0">
-              Click the X button to stop receiving notification
-            </p>
-          </div>
-          <div class="col">
-            <a
-              target="_blank"
-              href="https://selfregistration.cowin.gov.in/"
-              class="btn btn-link px-0"
-            >
-              CoWin Portal
-            </a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>

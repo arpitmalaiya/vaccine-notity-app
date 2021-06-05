@@ -2,7 +2,7 @@
   <div
     class="card-header text-white"
     [ngClass]="{
-      'bg-dark': centerDataFiltered.sessions.length > 0 && !isFilterEnabled,
+      'bg-sel': centerDataFiltered.sessions.length > 0 && !isFilterEnabled,
       'bg-success': centerDataFiltered.sessions.length > 0 && isFilterEnabled,
       'bg-danger': centerDataFiltered.sessions.length == 0
     }"
@@ -21,37 +21,36 @@
     </div>
   </div>
   <div class="card-body">
-    <h5 class="card-title">Block : {{ centerDataFiltered.block_name }}</h5>
-    <table class="table table-borderless table-sm">
+    <h6 class="card-title font-09 row no-gutters">
+      {{ centerDataFiltered.block_name
+      }}<span class="ml-auto badge badge-dark px-2">{{
+        centerDataFiltered.fee_type
+      }}</span>
+    </h6>
+    <table
+      id="address-table"
+      class="table table-borderless table-sm text-small"
+    >
       <tbody>
         <tr>
-          <td>Address</td>
           <td>{{ centerDataFiltered.address }}</td>
         </tr>
         <tr>
-          <td>District</td>
-          <td>{{ centerDataFiltered.district_name }}</td>
-        </tr>
-        <tr>
-          <td>State</td>
-          <td>{{ centerDataFiltered.state_name }}</td>
-        </tr>
-        <tr>
-          <td>pincode</td>
-          <td>{{ centerDataFiltered.pincode }}</td>
-        </tr>
-        <tr>
-          <td>Fee</td>
-          <td>{{ centerDataFiltered.fee_type }}</td>
+          <td>
+            {{ centerDataFiltered.district_name }},
+            {{ centerDataFiltered.state_name }},
+            {{ centerDataFiltered.pincode }}
+          </td>
         </tr>
       </tbody>
     </table>
-    <h6 *ngIf="centerDataFiltered.sessions.length" class="card-text">
+    <h6 *ngIf="centerDataFiltered.sessions.length" class="card-text font-09">
       Slot Availiblity
     </h6>
     <table
       *ngIf="centerDataFiltered.sessions.length"
       class="table table-bordered"
+      id="slot-table"
     >
       <thead>
         <tr>

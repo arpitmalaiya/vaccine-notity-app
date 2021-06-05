@@ -2,9 +2,10 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
+import { timeout } from 'rxjs/operators';
 import { ApiUrlService } from 'src/app/shared/api-url.service';
-import { PushNotificationsService } from 'src/app/shared/push-notifications.service'
-
+import { PushNotificationsService } from 'src/app/shared/push-notifications.service';
+var $:any
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
@@ -36,6 +37,7 @@ export class DashboardComponent implements OnInit,OnDestroy {
   }
 
   ngOnInit(): void {
+    
     this.searchForm = this.fb.group({
       selectTypeRadio: ['byPin'],
       state:[''],
@@ -72,7 +74,9 @@ export class DashboardComponent implements OnInit,OnDestroy {
       }
     )
     
-   this.todayDate = this.date.getDate() + '-' + (this.date.getMonth()+1) + '-' + this.date.getFullYear(); 
+   this.todayDate = this.date.getDate() + '-' + (this.date.getMonth()+1) + '-' + this.date.getFullYear();
+
+   this.loadBackground();
     
   }
   onSelectState(){
@@ -101,7 +105,20 @@ export class DashboardComponent implements OnInit,OnDestroy {
 
   onSubmitForm(){
     this.searchClicked = true;
-      var e:any = document.getElementsByName('fChecks');
+    this.apiService.invokeFilterMethodClick(
+      {
+        'ageFilter': [],
+        'doseFilter': [],
+        'feeFilter': []
+      }
+    );
+    this.clearSearchValues();
+    
+    this.apiCalls();
+    
+  }
+  clearSearchValues(){
+    var e:any = document.getElementsByName('fChecks');
       e.forEach(ele => {
         ele.checked =false;
       });
@@ -112,27 +129,25 @@ export class DashboardComponent implements OnInit,OnDestroy {
       checkArrayAge.clear();
       const checkArrayFee: FormArray = this.searchForm.get('checkArrayFee') as FormArray;
       checkArrayFee.clear();
-    
-    
-    this.apiCalls();
-    
   }
   apiCalls(){
-    this.apiService.invokeFilterMethodClick(
-      {
-        'ageFilter': [],
-        'doseFilter': [],
-        'feeFilter': []
-      }
-    );
+    
     if(this.searchForm.value.selectTypeRadio == "byPin"){
       if(this.searchForm.value.pinCode == '000000'){
         this.apiService.getDetailsByPinTest(this.searchForm.value.pinCode,this.todayDate).subscribe(
           res=>{
             this.isEmpty = false;
             this.dataCurrent = res;
-            //this.dataCurrent = this.allDataByPin;
-            
+            if(!this.dataCurrent.length){
+              this.isEmpty = true;
+            }else{
+              setTimeout(() => {
+                var element = document.getElementById("explore-fiter-section");
+                element.scrollIntoView(true);
+              }, 500);
+            } 
+           
+
             setTimeout(() => {
               this.dataPrevious = this.dataCurrent;
             }, 4000);
@@ -147,8 +162,15 @@ export class DashboardComponent implements OnInit,OnDestroy {
           res=>{
             this.isEmpty = false
             this.dataCurrent = res.centers;
-            //this.dataCurrent = this.allDataByPin;
-            
+            if(!this.dataCurrent.length){
+              this.isEmpty = true;
+            }else{
+              setTimeout(() => {
+                var element = document.getElementById("explore-fiter-section");
+                element.scrollIntoView(true);
+              }, 500);
+            } 
+
             setTimeout(() => {
               this.dataPrevious = this.dataCurrent;
             }, 4000);
@@ -163,8 +185,20 @@ export class DashboardComponent implements OnInit,OnDestroy {
       this.apiService.getDetailsByDist(this.searchForm.value.district,this.todayDate).subscribe(
         res=>{
           this.isEmpty = false
-          this.allDataByPin = res.centers;
-          this.dataCurrent = this.allDataByPin;
+          if(!this.dataCurrent.length){
+            this.isEmpty = true;
+          }else{
+            setTimeout(() => {
+              var element = document.getElementById("explore-fiter-section");
+              element.scrollIntoView(true);
+            }, 500);
+          } 
+          this.dataCurrent = res.centers;
+          
+
+          setTimeout(() => {
+            this.dataPrevious = this.dataCurrent;
+          }, 4000);
         },
         err=>{
           this.isEmpty = true;
@@ -173,6 +207,8 @@ export class DashboardComponent implements OnInit,OnDestroy {
     }
   }
   toggleWay(value){
+    console.log(value);
+    
     if(value == 'byDistrict'){
       this.searchForm.controls.state.setValidators([Validators.required]);
       this.searchForm.controls.district.setValidators([Validators.required]);
@@ -295,9 +331,26 @@ export class DashboardComponent implements OnInit,OnDestroy {
     this.allNewBanner=[];
     this.apiService.setIndiNotify(null);
   }
+  loadBackground(){
+    var randomNum = Math.ceil( Math.random() * 5 );
+
+    if (randomNum == 1) {
+      document.getElementById('home-section').style.backgroundImage = "url('https://cdn.pixabay.com/photo/2020/05/20/21/36/corona-5198347_960_720.jpg')";
+    } else if (randomNum == 2) {
+      document.getElementById('home-section').style.backgroundImage = "url('https://cdn.pixabay.com/photo/2016/12/05/19/46/syringe-1884779_960_720.jpg')";
+    } else if (randomNum == 3) {
+      document.getElementById('home-section').style.backgroundImage = "url('https://cdn.pixabay.com/photo/2020/04/28/07/01/vaccine-5103088_960_720.jpg')";
+    } else if (randomNum == 4) {
+      document.getElementById('home-section').style.backgroundImage = "url('https://cdn.pixabay.com/photo/2021/01/06/19/45/vaccine-5895477_960_720.jpg')";
+    } else if (randomNum == 5) {
+      document.getElementById('home-section').style.backgroundImage = "url('https://cdn.pixabay.com/photo/2019/01/02/06/31/syringe-3908157_960_720.jpg')";
+    }
+
+  }
   ngOnDestroy(){
     clearInterval(this.intervalNotify);
     this.triggerNotificationSubs.unsubscribe();
     this.getIndiNotiSubs.unsubscribe();
   }
+  
 }
