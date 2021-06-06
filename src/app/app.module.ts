@@ -14,7 +14,10 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import {HttpClientModule, HTTP_INTERCEPTORS} from '@angular/common/http';
 import { AuthInterceptorService } from 'src/app/shared/auth-interceptor.service';
 import { DetailCardComponent } from './core/components/detail-card/detail-card.component';
-import { VaccineMeasuresComponent } from './core/components/vaccine-measures/vaccine-measures.component'
+import { VaccineMeasuresComponent } from './core/components/vaccine-measures/vaccine-measures.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
+import {MatSelectModule} from '@angular/material/select';
+import { MatFormFieldModule } from '@angular/material/form-field';
 
 @NgModule({
   declarations: [
@@ -34,7 +37,11 @@ import { VaccineMeasuresComponent } from './core/components/vaccine-measures/vac
     AppRoutingModule,
     FormsModule,
     ReactiveFormsModule,
-    HttpClientModule
+    HttpClientModule,
+    BrowserAnimationsModule,
+    MatSelectModule,
+    MatFormFieldModule
+    
   ],
   schemas:[CUSTOM_ELEMENTS_SCHEMA],
   // providers: [

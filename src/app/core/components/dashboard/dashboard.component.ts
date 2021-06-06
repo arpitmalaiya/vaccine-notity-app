@@ -17,7 +17,7 @@ export class DashboardComponent implements OnInit,OnDestroy {
   date = new Date();
   showTime;
   searchForm:FormGroup
-  states:any[] ;
+  states:any[]=[] ;
   districts:any[];
   allDataByPin: any[] = [];
   filterPara: any;
@@ -47,12 +47,7 @@ export class DashboardComponent implements OnInit,OnDestroy {
       checkArrayFee: this.fb.array([]),
       checkArrayDose: this.fb.array([]),
      })
-    
-    this.apiService.getStatesData().subscribe(
-      res=>{
-        this.states = res.states;
-      }
-    )
+  
 
     this.triggerNotificationSubs =  this.apiService.triggerNotification.subscribe(
       res=>{
@@ -79,12 +74,16 @@ export class DashboardComponent implements OnInit,OnDestroy {
    this.loadBackground();
     
   }
-  onSelectState(){
-    this.apiService.getDistrictData(this.searchForm.value.state).subscribe(
-      res=>{
-        this.districts = res.districts
-      }
-    )
+  onSelectState(){    
+    this.searchForm.controls.district.patchValue('')
+    if(this.searchForm.value.state !== ''){
+      this.apiService.getDistrictData(this.searchForm.value.state).subscribe(
+        res=>{
+          this.districts = res.districts
+        }
+      )
+    }
+    
   }
 
   allNewDataPush = [];
@@ -209,7 +208,15 @@ export class DashboardComponent implements OnInit,OnDestroy {
   toggleWay(value){
     console.log(value);
     
+    
     if(value == 'byDistrict'){
+      if(!this.states.length){
+        this.apiService.getStatesData().subscribe(
+      res=>{
+        this.states = res.states;
+      }
+    )
+      }
       this.searchForm.controls.state.setValidators([Validators.required]);
       this.searchForm.controls.district.setValidators([Validators.required]);
       this.searchForm.controls.pinCode.clearValidators();

@@ -53,37 +53,37 @@
                     id="byState"
                     class="form-group"
                   >
-                    <select
-                      class="form-control form-control-lg"
+                    <mat-select
+                      class="form-control form-control-lg text-left"
                       formControlName="state"
-                      (change)="onSelectState()"
+                      (selectionChange)="onSelectState()"
                     >
-                      <option value="">Select State</option>
-                      <option
+                      <mat-option value="">Select State</mat-option>
+                      <mat-option
                         *ngFor="let state of states"
-                        [ngValue]="state.state_id"
+                        [value]="state.state_id"
                       >
                         {{ state.state_name }}
-                      </option>
-                    </select>
+                      </mat-option>
+                    </mat-select>
                   </div>
                   <div
                     *ngIf="searchForm.value.selectTypeRadio == 'byDistrict'"
                     id="byDistrict"
                     class="form-group"
                   >
-                    <select
-                      class="form-control form-control-lg"
+                    <mat-select
+                      class="form-control form-control-lg text-left"
                       formControlName="district"
                     >
-                      <option value="">Select District</option>
-                      <option
+                      <mat-option value="">Select District</mat-option>
+                      <mat-option
                         *ngFor="let dist of districts"
-                        [ngValue]="dist.district_id"
+                        [value]="dist.district_id"
                       >
                         {{ dist.district_name }}
-                      </option>
-                    </select>
+                      </mat-option>
+                    </mat-select>
                   </div>
                   <div>
                     <button
@@ -239,7 +239,7 @@
   class="text-center py-3 text-monospace"
 >
   <p class="mb-0">Didn't find your center?</p>
-  <p class="mb-0">
+  <p class="mb-0 px-1">
     Get notified for upcoming slots, Click
     <a
       (click)="getNotify()"
