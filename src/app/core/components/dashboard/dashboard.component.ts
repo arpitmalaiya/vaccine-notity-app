@@ -227,6 +227,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         .subscribe(
           (res) => {
             this.isEmpty = false;
+            this.dataCurrent = res.centers;
             if (!this.dataCurrent.length) {
               this.isEmpty = true;
             } else {
@@ -235,7 +236,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
                 element.scrollIntoView(true);
               }, 500);
             }
-            this.dataCurrent = res.centers;
 
             setTimeout(() => {
               this.dataPrevious = this.dataCurrent;
