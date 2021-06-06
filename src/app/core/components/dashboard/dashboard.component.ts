@@ -61,11 +61,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
       });
 
     this.getIndiNotiSubs = this.apiService.getIndiNotiData.subscribe((res) => {
-      console.log(res);
-
+      this.indiNotiCenter = res;
       if (!(res == 'nullString') && res) {
         //open popup
-        this.indiNotiCenter = res;
+
         var ele: any = document.getElementById('trigger-modal');
         ele.click();
       }
